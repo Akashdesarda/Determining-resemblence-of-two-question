@@ -1,8 +1,12 @@
 import warnings
 warnings.filterwarnings('ignore')
 
+from typing import Dict
+from matplotlib import pyplot as plt
 import tensorflow as tf
 import tensorflow_hub as hub
+from datetime import datetime
+now = datetime.now().strftime("%d-%m-%Y")
 
 def clean_text(doc):
     """Cleaning of text data
@@ -39,5 +43,38 @@ def generate_embedding(pretrained_weights: str='./pretrained_weights/universal_s
     """
     embed = hub.load(pretrained_weights)
     return embed(tf.squeeze(tf.cast(doc, tf.string)))
+
+def visualize(history: Dict, save_plot: bool=True, save_dir: str=None):
+    """Visualize training history of model
+    
+    Parameters
+    ----------
+    history : Dict
+        model.fit history
+    save_plot : bool, optional
+        save plot to hard disk, by default True
+    save_dir : str, optional
+        path to save plot, by default None
+    """
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
+
+    # Plot training & validation loss values
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    
+    if save_plot is not False:
+        plt.savefig(save_dir)
+    else:
+        plt.show()
     
 
