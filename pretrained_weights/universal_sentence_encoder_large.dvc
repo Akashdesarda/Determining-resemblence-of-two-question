@@ -1,0 +1,7 @@
+md5: 043f7b9dd08dfbd7553f973e7f726215
+outs:
+- md5: 034862b5ff649810adce3e215444886e.dir
+  path: universal_sentence_encoder_large
+  cache: true
+  metric: false
+  persist: false

@@ -1,0 +1,7 @@
+md5: bf0337feebbf098d1dac9db907672b05
+outs:
+- md5: 5719a02d98c3bcc19caa03d3bf48eebc
+  path: train_que.csv
+  cache: true
+  metric: false
+  persist: false
