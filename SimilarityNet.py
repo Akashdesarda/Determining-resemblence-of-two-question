@@ -2,7 +2,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import tensorflow as tf
-import tensorflow_hub as hub
 from keras import backend as K
 from keras.layers import Dense, concatenate, Lambda, Activation, BatchNormalization, Input, Dropout
 from keras.models import Model, Sequential
