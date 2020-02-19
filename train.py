@@ -1,7 +1,6 @@
 import warnings
 warnings.filterwarnings('ignore')
 
-import re
 import pandas as pd
 import numpy as np
 np.random.seed(30)
@@ -14,15 +13,26 @@ from sklearn.model_selection import train_test_split
 
 import tensorflow as tf
 import tensorflow_hub as hub
+from keras import backend as K
 from keras.utils import to_categorical
 
-from utils import clean_text, generate_embedding, visualize
+from utils import clean_text, visualize
 from SimilarityNet import build
 from callbacks import callbacks
 
 data = pd.read_csv('./data/train_que.csv')
+print("[INFO]...Data loaded Successfully")
 data.dropna(inplace = True)
 data['question1'], data['question2'] = data['question1'].apply(clean_text), data['question2'].apply(clean_text)
+print("[INFO]...Data transformation completed")
+
+#Loadind universal sentence encoder
+print("[INFO]...Loadind universal sentence encoder")
+embed = hub.load('https://tfhub.dev/google/universal-sentence-encoder-large/5')
+# creating a method for embedding and will using method for every input layer 
+def UniversalEmbedding(doc):
+    return embed(tf.squeeze(tf.cast(doc, tf.string)))
+print("[INFO]...Pretrained weights from tensorflow hub successfully loaded")
 
 # Tf GPU memory graph
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -38,7 +48,7 @@ if gpus:
         print(e)
         
 # Building network
-model = build(generate_embedding)
+model = build(UniversalEmbedding)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print("[INFO]...Model Build Completed")
 # Preparing training & validation data
@@ -67,15 +77,20 @@ test_labels = to_categorical(y_test, num_classes=2)
 # Callbacks list
 callbacks_list = callbacks()
 
-session = tf.Session()
-K.set_session(session)
-session.run(tf.global_variables_initializer())
-session.run(tf.tables_initializer())
-history = model.fit([train_q1, train_q2],
-                    train_labels,
-                    validation_data=([test_q1, test_q2], test_labels),
-                    epochs=20,
-                    batch_size=512)
+with tf.Session() as session:
+    K.set_session(session)
+    session.run(tf.global_variables_initializer())
+    session.run(tf.tables_initializer())
+    history = model.fit([train_q1, train_q2],
+                        train_labels,
+                        validation_data=([test_q1, test_q2], test_labels),
+                        callbacks=callbacks_list,
+                        epochs=20,
+                        batch_size=512)
 
-visualize(history,
-          save_dir=f'./assets/logs/history-{now}.png')
+    visualize(history,
+            save_dir=f'./assets/logs/history-{now}.png')
+    
+    json_config = model.to_json()
+    with open('model_config.json', 'w') as json_file:
+        json_file.write(json_config)
