@@ -1,8 +1,18 @@
-from keras.callbacks import ModelCheckpoint, TerminateOnNaN, LearningRateScheduler, CSVLogger
+import mlflow
+from keras.callbacks import ModelCheckpoint, TerminateOnNaN, LearningRateScheduler, CSVLogger, Callback
 from datetime import datetime
 now = datetime.now().strftime("%d-%m-%Y")
 
-#TODO: Add mlflow callback
+class MlflowCallback(Callback):
+    
+    def on_train_begin(self, logs=None):
+        print("[INFO}...Training has begun and track with Mlflow")
+            
+    def on_epoch_end(self, epoch, logs=None):
+        mlflow.log_metric('loss',logs['loss'])
+        mlflow.log_metric('val_loss',logs['val_loss'])
+        print(f"At end of Epoch {epoch} loss is {logs['loss']:.4f} and val_loss is {logs['val_loss']:.4f}")
+        
 def callbacks():
     """Keras callbacks which include ModelCheckpoint, CSVLogger, TensorBoard, LearningRateScheduler, TerminateOnNaN
     
@@ -31,5 +41,7 @@ def callbacks():
 
     terminate_on_nan = TerminateOnNaN()
     
-    callbacks_list = [model_checkpoint, csv_logger, lr_schedular, terminate_on_nan]
+    mlflow = MlflowCallback()
+    
+    callbacks_list = [mlflow, model_checkpoint, csv_logger, lr_schedular, terminate_on_nan]
     return callbacks_list
