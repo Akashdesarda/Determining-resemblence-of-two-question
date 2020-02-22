@@ -19,6 +19,7 @@ from keras.utils import to_categorical
 from utils import clean_text, visualize
 from SimilarityNet import build
 from callbacks import callbacks
+import mlflow
 
 data = pd.read_csv('./data/train_que.csv')
 print("[INFO]...Data loaded Successfully")
@@ -77,20 +78,26 @@ test_labels = to_categorical(y_test, num_classes=2)
 # Callbacks list
 callbacks_list = callbacks()
 
-with tf.Session() as session:
-    K.set_session(session)
-    session.run(tf.global_variables_initializer())
-    session.run(tf.tables_initializer())
-    history = model.fit([train_q1, train_q2],
-                        train_labels,
-                        validation_data=([test_q1, test_q2], test_labels),
-                        callbacks=callbacks_list,
-                        epochs=20,
-                        batch_size=512)
+#Mlflow config
+mlflow_tag = {'SimilarityNet':'Dense512', 'Dataset':'Quora duplicate question'}
+mlflow.set_tracking_uri('http://127.0.0.1:5000')
 
-    visualize(history,
-            save_dir=f'./assets/logs/history-{now}.png')
-    
-    json_config = model.to_json()
-    with open('model_config.json', 'w') as json_file:
-        json_file.write(json_config)
+with mlflow.start_run(experiment_id=2, run_name='duplicate_que', nested=True):
+    mlflow.set_tags(mlflow_tag)
+    with tf.Session() as session:
+        K.set_session(session)
+        session.run(tf.global_variables_initializer())
+        session.run(tf.tables_initializer())
+        history = model.fit([train_q1, train_q2],
+                            train_labels,
+                            validation_data=([test_q1, test_q2], test_labels),
+                            callbacks=callbacks_list,
+                            epochs=20,
+                            batch_size=512)
+
+        visualize(history,
+                save_dir=f'./assets/logs/history-{now}.png')
+        
+        json_config = model.to_json()
+        with open('model_config.json', 'w') as json_file:
+            json_file.write(json_config)
