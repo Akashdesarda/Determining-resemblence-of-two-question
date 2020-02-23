@@ -1,0 +1,7 @@
+md5: fb1548fe2f96c1f836c35541d8599b73
+outs:
+- md5: 33f478b1e28a87ed7c1f5e8ff605f3c6
+  path: q2_use_embeddings_404287.npy
+  cache: true
+  metric: false
+  persist: false
