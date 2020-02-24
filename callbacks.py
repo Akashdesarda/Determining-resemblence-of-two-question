@@ -6,7 +6,7 @@ now = datetime.now().strftime("%d-%m-%Y")
 class MlflowCallback(Callback):
     
     def on_train_begin(self, logs=None):
-        print("[INFO}...Training has begun and track with Mlflow")
+        print("[INFO]...Training has begun and tracking with Mlflow")
             
     def on_epoch_end(self, epoch, logs=None):
         mlflow.log_metric('loss',logs['loss'])
@@ -21,9 +21,9 @@ def callbacks():
     list
         all callbacks
     """
-    model_checkpoint = ModelCheckpoint(filepath='./assets/weights/dense_512/SimilarityNet-{epoch:02d}-{val_accuracy:.2f}.hdf5',
+    model_checkpoint = ModelCheckpoint(filepath='./assets/weights/DenseIncrementalSigmoid/exp2/SimilarityNet-epoch:{epoch:02d}-val_acc:{val_accuracy:.2f}.hdf5',
                 save_best_only=True,
-                save_weights_only=True,
+                save_weights_only=False,
                 verbose=1)
 
     csv_logger = CSVLogger(filename=f"./assets/logs/logs-{now}.csv",

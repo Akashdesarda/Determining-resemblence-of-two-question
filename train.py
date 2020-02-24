@@ -57,7 +57,7 @@ print("[INFO]...Model Build Completed")
 # Preparing training & validation data
 x1 = np.load('./data/q1_use_embeddings_404287.npy')
 x2 = np.load('./data/q1_use_embeddings_404287.npy')
-labels = data['is_duplicate']
+labels = pd.get_dummies(data['is_duplicate']) 
 # Using the sklearn to split data in question1 and question2 train and test in the ration 80-20 %
 x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2, labels, test_size=0.25, random_state=42)
 
@@ -80,7 +80,7 @@ x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2,
 callbacks_list = callbacks()
 
 #Mlflow config
-mlflow_tag = {'SimilarityNet':'DenseIncremental', 'Dataset':'Quora question pair'}
+mlflow_tag = {'SimilarityNet':'DenseIncremental', 'Activation':'Sigmoid' ,'Dataset':'Quora question pair'}
 mlflow.set_tracking_uri('http://127.0.0.1:5000')
 
 with mlflow.start_run(experiment_id=2, run_name='using_embeddings', nested=True):
@@ -99,6 +99,6 @@ with mlflow.start_run(experiment_id=2, run_name='using_embeddings', nested=True)
         visualize(history,
                 save_dir=f'./assets/logs/history-{now}.png')
         
-        json_config = model.to_json()
-        with open('model_config.json', 'w') as json_file:
-            json_file.write(json_config)
+        # json_config = model.to_json()
+        # with open('model_config.json', 'w') as json_file:
+        #     json_file.write(json_config)

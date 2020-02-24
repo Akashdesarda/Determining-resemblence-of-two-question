@@ -4,8 +4,6 @@ warnings.filterwarnings('ignore')
 import re
 from typing import Dict
 from matplotlib import pyplot as plt
-# import tensorflow as tf
-# import tensorflow_hub as hub
 from datetime import datetime
 now = datetime.now().strftime("%d-%m-%Y")
 
