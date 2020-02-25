@@ -21,7 +21,7 @@ def callbacks():
     list
         all callbacks
     """
-    model_checkpoint = ModelCheckpoint(filepath='./assets/weights/DenseIncrementalSigmoid/exp2/SimilarityNet-epoch:{epoch:02d}-val_acc:{val_accuracy:.2f}.hdf5',
+    model_checkpoint = ModelCheckpoint(filepath='./assets/weights/DenseIncrementalSigmoid/exp3/SimilarityNet-epoch:{epoch:02d}-val_acc:{val_accuracy:.2f}.hdf5',
                 save_best_only=True,
                 save_weights_only=False,
                 verbose=1)
