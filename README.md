@@ -105,3 +105,4 @@ Fine-tuning can be done by changing two configration.
 1. CLI tool
 2. Universal generic notebook to carry all function.
 3. Add examples 
+4. Make TF 2.0 compatible
