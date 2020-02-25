@@ -5,8 +5,8 @@
 Deep learning tool to determine similarity of given two question. The tool will is able to understand context of question to determine the similarity.
 
 >eg:
-Question 1: What is your name?
-Question 2: Who are you?
+Question 1: What is your age?
+Question 2: How old are you?
 --> They are Similar 
 
 ### Contents
