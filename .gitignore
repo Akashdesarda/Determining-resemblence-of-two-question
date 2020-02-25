@@ -131,3 +131,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+assets/weights/RandomForest/SmilarityNet-RandomForest-nest500.pkl
+assets/weights/CatBoost/SimilarityNet-Catboost-depth10

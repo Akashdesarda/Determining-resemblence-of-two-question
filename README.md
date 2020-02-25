@@ -14,12 +14,11 @@ Question 2: Who are you?
 1. [Overview](#overview)
 2. [Architecture](#architecture)
 3. [Performance](#performance)
-4. [Examples](#examples)
-5. [How to use it](#how-to-use-it)
-6. [Download the Weights and embeddings](#download-the-weights-and-embeddings)
-7. [How to fine-tune one of the trained models on your own dataset](#how-to-fine-tune-one-of-the-trained-models-on-your-own-dataset)
-8. [ToDo](#todo)
-
+<!-- 4. [Examples](#examples) -->
+4. [How to use it](#how-to-use-it)
+5. [Download the Weights and embeddings](#download-the-weights-and-embeddings)
+6. [How to fine-tune one of the trained models on your own dataset](#how-to-fine-tune-one-of-the-trained-models-on-your-own-dataset)
+7. [ToDo](#todo)
 
 ### Overview
 
@@ -45,11 +44,31 @@ The architecture can be divided in two part:
 
 2. Prediction using SimilarityNet:
 
-- The Network is three layer & finally softmax layer to predict.
+- SimilarityNet is a classifier (with multiple backend to choose from) which takes word embeddings as input & then classify them as, 0: Not Similar; 1: Similar
+
+- Currently it supports three backend classifier:
+
+    1. ANN
+    2. Random Forest
+    3. Catboost
+
+>*Note:* Currently SimilarityNet with Catboost as backend works best & so it will be default backend.
 
 ### Performance
 
-### Examples
+1. Embeddings Generator: It takes about 0.1 sec per embeddings.
+2. Training Performance:
+
+    1. ANN: (GPU) It takes about 70-90 sec per epoch
+    2. Random Forest: (CPU only) It takes about 20 min on 75% of Quora question pairs dataset.
+    3. Catboost: (GPU) It is fastest among all, takes about 5 min.  
+3. Benchmark result:
+    
+    1. ANN: 80%
+    2. Random Forest: 83.34%
+    3. Catboost: 86.7%
+
+<!-- ### Examples -->
 
 ### How to use it
 
@@ -83,3 +102,6 @@ Fine-tuning can be done by changing two configration.
 
 ### TODO
 
+1. CLI tool
+2. Universal generic notebook to carry all function.
+3. Add examples 
