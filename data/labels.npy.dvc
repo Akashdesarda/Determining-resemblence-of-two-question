@@ -1,0 +1,7 @@
+md5: 3d633e65dcb2fc612a5e5407e4cf47fb
+outs:
+- md5: 9898f2a4344351224edfbd27aebff56c
+  path: labels.npy
+  cache: true
+  metric: false
+  persist: false
