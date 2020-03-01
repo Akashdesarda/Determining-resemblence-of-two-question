@@ -13,15 +13,20 @@ class MlflowCallback(Callback):
         mlflow.log_metric('val_loss',logs['val_loss'])
         print(f"At end of Epoch {epoch} loss is {logs['loss']:.4f} and val_loss is {logs['val_loss']:.4f}")
         
-def callbacks():
+def callbacks(save_path: str):
     """Keras callbacks which include ModelCheckpoint, CSVLogger, TensorBoard, LearningRateScheduler, TerminateOnNaN
     
+    Parameters
+    ----------
+    save_path: str
+        local directory to save model weights
+        
     Returns
     -------
     list
         all callbacks
     """
-    model_checkpoint = ModelCheckpoint(filepath='./assets/weights/DenseIncrementalSigmoid/exp3/SimilarityNet-epoch:{epoch:02d}-val_acc:{val_accuracy:.2f}.hdf5',
+    model_checkpoint = ModelCheckpoint(filepath=f"{save_path}/"+"SimilarityNet-epoch:{epoch:02d}-val_acc:{val_accuracy:.2f}.hdf5",
                 save_best_only=True,
                 save_weights_only=False,
                 verbose=1)
@@ -41,7 +46,7 @@ def callbacks():
 
     terminate_on_nan = TerminateOnNaN()
     
-    mlflow = MlflowCallback()
+    # mlflow = MlflowCallback()
     
-    callbacks_list = [mlflow, model_checkpoint, csv_logger, lr_schedular, terminate_on_nan]
+    callbacks_list = [model_checkpoint, csv_logger, lr_schedular, terminate_on_nan]
     return callbacks_list

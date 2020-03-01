@@ -1,0 +1,20 @@
+limit_gpu: True
+mode: 'training'
+embedding:
+  model_url: https://tfhub.dev/google/universal-sentence-encoder-large/5
+  job: unit
+
+inference:
+  input:
+    -
+    -
+  backend_classifier: catboost
+  model_path: 
+
+training:
+  backend: catboost
+  model_save_path:
+  log_report: True
+  neural_net:
+    epoch: 20
+    batch_size: 512

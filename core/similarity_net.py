@@ -3,16 +3,16 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from keras.layers import Dense, concatenate, Activation, BatchNormalization, Dropout
-from keras.models import Model, Input
+from keras.models import Model, Input, Sequential
 from sklearn.ensemble import RandomForestClassifier
 from catboost import CatBoostClassifier
 
 
-class SimilarityNet():
+class SimilarityNet:
     """Build backend for Classification Job. Currently three backend are supported:
-       1. NeuralNet
-       2. Random Forest Classifier
-       3. Catboost classifier
+       1. Random Forest Classifier
+       2. Catboost classifier
+       3. NeuralNet
     """
     # def __init__(self, train_data, train_label):
     #     """Build a classification model
@@ -81,8 +81,43 @@ class SimilarityNet():
         return model
     
     @staticmethod
-    def build_nn(dropout: float=0.25,verbosity: int=0):
+    def build_nn(dropout: float=0.3,verbosity: int=0):
+        """Build network to determine resemblance of two question
+        
+        Parameters
+        ----------
+        dropout : float, optional
+            Dropout value, by default 0.25
+        verbosity : int, optional
+            Print verbosity or model summary if > 0, by default 0
+        """
+        model = Sequential()
+        model.add(Dense(1024, input_shape=(1024,), activation='relu', kernel_regularizer=regularizers.l2(0.02)))
+        model.add(BatchNormalization())
+        model.add(Dropout(dropout))
+
+        model.add(Dense(1024, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dropout(dropout))
+
+        model.add(Dense(512, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dropout(dropout))
+
+        model.add(Dense(512, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dropout(dropout))
+
+        model.add(Dense(1, activation='sigmoid'))
+        
+        if verbosity > 0:
+            model.summary()
+        return model
+    
+    @staticmethod
+    def build_nn_experimental(dropout: float=0.3, verbosity: int=0):
         """Build network to determine resemblance of two question using Keras Functional API
+           Note: This is experimental Neural net where embeddings of both question are feed to network seprately. So there will be two input.
         
         Parameters
         ----------
@@ -98,22 +133,22 @@ class SimilarityNet():
         # Network for 1st input Dense 128 --> Relu --> Dense 264 --> Relu
         input1_layer = Dense(512, activation='relu')(input_q1)
         input1_layer = BatchNormalization()(input1_layer)
-        input1_layer = Dropout(0.3)(input1_layer)
+        input1_layer = Dropout(dropout)(input1_layer)
         
         input1_layer = Dense(512, activation='relu')(input1_layer)
         input1_layer = BatchNormalization()(input1_layer)
-        input1_layer = Dropout(0.3)(input1_layer)
+        input1_layer = Dropout(dropout)(input1_layer)
         
         input1_layer = Model(inputs=input_q1, outputs=input1_layer)
         
         # Network for 2st input Dense 128 --> Relu --> Dense 264 --> Relu
         input2_layer = Dense(512, activation='relu')(input_q2)
         input2_layer = BatchNormalization()(input2_layer)
-        input2_layer = Dropout(0.3)(input2_layer)
+        input2_layer = Dropout(dropout)(input2_layer)
         
         input2_layer = Dense(512, activation='relu')(input2_layer)
         input2_layer = BatchNormalization()(input2_layer)
-        input2_layer = Dropout(0.3)(input2_layer)
+        input2_layer = Dropout(dropout)(input2_layer)
         
         input2_layer = Model(inputs=input_q2, outputs=input2_layer)
         
@@ -124,7 +159,7 @@ class SimilarityNet():
         pred_layer = Dense(1024, activation='relu')(pred_layer)
         pred_layer = Dense(256, activation='relu')(pred_layer)
         pred_layer = Dense(64, activation='relu')(pred_layer)
-        pred_layer = Dropout(0.3)(pred_layer)
+        pred_layer = Dropout(dropout)(pred_layer)
         
         pred_layer = Dense(1, activation='sigmoid')(pred_layer)
         
