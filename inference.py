@@ -1,43 +1,49 @@
-import warnings
-warnings.filterwarnings('ignore')
+from typing import Dict, List
 
 import numpy as np
-from keras.models import load_model
-import tensorflow_hub as hub
 import tensorflow as tf
+from core.embeddings_generator import Generator
+
+from keras.models import load_model
+from catboost import CatBoostClassifier
+import joblib
 
 tf.compat.v1.enable_eager_execution()
 
-module_url = "https://tfhub.dev/google/universal-sentence-encoder-large/5"
-model = hub.load(module_url)
-print (f"module {module_url} loaded")
-def embed(input):
-  return model(input)
+def predict(config: Dict):
+    """Predict Similarity on given two question
 
-# Taking question as Input
-q1 = input("Type Question 1 here -->")
-q2 = input("Type Question 2 here -->")
-
-que = [q1, q2]
-
-# Generating embedding 
-inq1 = np.array(embed([que[0]]))
-inq2 = np.array(embed([que[1]]))
-
-tf.compat.v1.disable_eager_execution()
-
-# Loading the save weights
-model = load_model('assets/weights/DenseIncrementalSigmoid/exp2/SimilarityNet-epoch:12-val_acc:0.78.hdf5')
-                    
-# Predicting the similarity between the two input questions 
-predicts = model.predict([inq1, inq2])
-predict_logits = predicts.argmax(axis=1)
-# print("----FINAL RESULT----")
-# if(predict_logits[0] == 1):
-#     print("****Questions are Similar****")
-# else:
-#     print("****Questions are not Similar****")
-
-print(predict_logits)
-print(predicts)
-#TODO: 1. Complete Inference logic & its validation. 
+    Parameters
+    ----------
+    config : Dict
+        Config yaml/json containing respective value
+    """
+    # Generating embedding 
+    generator = Generator(config['embedding']['model_url'])
+    if config['embedding']['job'] == 'unit':
+        que = config['inference']['input']
+        inq1 = np.array(generator.unit_generator([que[0]]))
+        inq2 = np.array(generator.unit_generator([que[1]]))
+        inque = np.concatenate(inq1, inq2, axis=1)
+    
+    tf.compat.v1.disable_eager_execution()
+    
+    if config['inference']['backend_classifier'] == 'catboost':
+        model = CatBoostClassifier()
+        model.load_model(config['inference']['model_path'])
+        result = model.predict(inque)
+        
+    elif config['inference']['backend_classifier'] == 'random forest':
+        model = joblib.load(config['inference']['model_path'])
+        result = model.predict(inque)
+    
+    elif config['inference']['backend_classifier'] == 'neural net':
+        model = load_model(config['inference']['model_path'])
+        result_proba = model.predict(inque)
+        result = result_proba.argmax(axis = 1)
+        
+    print("[INFO]...Results are:")
+    if(result[0] == 1):
+        print("****Questions are Similar****")
+    else:
+        print("****Questions are not Similar****")
